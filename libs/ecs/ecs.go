@@ -316,7 +316,7 @@ func placeTask(ecsSvc *ecs.ECS, task *Task, desiredCount int64) ([]string, error
 
 	taskIDs := []string{}
 	for _, placedTask := range output.Tasks {
-		taskIDs = append(taskIDs, strings.Split(*placedTask.TaskArn, "/")[1])
+		taskIDs = append(taskIDs, strings.Split(*placedTask.TaskArn, "/")[2])
 	}
 
 	return taskIDs, nil
