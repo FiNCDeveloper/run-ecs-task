@@ -10,7 +10,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/ngocson2vn/run-ecs-task/libs/ecs"
+	"github.com/FiNCDeveloper/run-ecs-task/libs/ecs"
 )
 
 type RequiredEnv struct {
