@@ -1,4 +1,4 @@
-module github.com/ngocson2vn/run-ecs-task
+module github.com/FiNCDeveloper/run-ecs-task
 
 go 1.13
 
