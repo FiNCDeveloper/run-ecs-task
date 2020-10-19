@@ -71,7 +71,6 @@ func getRequiredEnv() (RequiredEnv, error) {
 }
 
 func main() {
-	log.Println("Version 0.0.12")
 	sigs := make(chan os.Signal, 1)
 	done := make(chan bool, 1)
 	signal.Notify(sigs, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
