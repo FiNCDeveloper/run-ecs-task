@@ -7,11 +7,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/FiNCDeveloper/run-ecs-task/libs/cloudwatch"
+	"github.com/FiNCDeveloper/run-ecs-task/libs/util"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ecs"
-	"github.com/FiNCDeveloper/run-ecs-task/libs/cloudwatch"
-	"github.com/FiNCDeveloper/run-ecs-task/libs/util"
 )
 
 type Task struct {
@@ -330,6 +330,18 @@ func traceTask(ecsSvc *ecs.ECS, taskId string, task *Task) error {
 
 	// Update task status
 	task.Status = *ecsTask.LastStatus
+
+	// ECSの仕様上、コンテナの起動より前で失敗した場合、
+	// コンテナ自体の終了コードは0という扱いになってしまい、成功扱いになる
+	// それを防ぐために、一度も RUNNING にならずに STOPPED になった場合はエラー扱いにする
+	// 厳密な実装ではないので、RUNNING の時間が十分短い場合、
+	// RUNNING -> STOPPED と正常に推移したものをエラーとして扱ってしまう可能性が理論上は存在する
+	// しかし、主なユースケースである rake task の起動時間と処理の実行時間を考えると実際には起きないはず
+	// 本来は AWS SDK の WaitUntilTasksRunning, WaitUntilTasksStopped を使って厳密に実装するべきだが、
+	// 上記理由と実装コストにより見送る
+	if task.Status == TASK_STATUS_STOPPED {
+		return fmt.Errorf("The task has stopped without ever reaching the status 'RUNNING' for reason: %s", *ecsTask.stoppedReason)
+	}
 
 	// Wait until task status becomes RUNNING or STOPPED
 	for *ecsTask.LastStatus != TASK_STATUS_RUNNING && *ecsTask.LastStatus != TASK_STATUS_STOPPED {
