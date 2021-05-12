@@ -340,7 +340,7 @@ func traceTask(ecsSvc *ecs.ECS, taskId string, task *Task) error {
 	// 本来は AWS SDK の WaitUntilTasksRunning, WaitUntilTasksStopped を使って厳密に実装するべきだが、
 	// 上記理由と実装コストにより見送る
 	if task.Status == TASK_STATUS_STOPPED {
-		return fmt.Errorf("The task has stopped without ever reaching the status 'RUNNING' for reason: %s", *ecsTask.stoppedReason)
+		return fmt.Errorf("The task has stopped without ever reaching the status 'RUNNING' for reason: %s", *ecsTask.StoppedReason)
 	}
 
 	// Wait until task status becomes RUNNING or STOPPED
